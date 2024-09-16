@@ -10,10 +10,14 @@ import { motion } from "framer-motion"; // For smooth animations
 import Confetti from "react-confetti"; // Import react-confetti
 
 const CommunityRecommendationPage = () => {
-  const [communityName, setCommunityName] = useState < string > "";
-  const [description, setDescription] = useState < string > "";
-  const [category, setCategory] = useState < string > "general";
-  const [showConfetti, setShowConfetti] = useState < boolean > false;
+  // const [communityName, setCommunityName] = useState < string > "";
+  // const [description, setDescription] = useState < string > "";
+  // const [category, setCategory] = useState < string > "general";
+  // const [showConfetti, setShowConfetti] = useState < boolean > false;
+  const [communityName, setCommunityName] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("general");
+  const [showConfetti, setShowConfetti] = useState(false);
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
   // Set window size on mount
