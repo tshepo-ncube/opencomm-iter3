@@ -331,29 +331,73 @@ const Chatbot = ({ setEventForm, setShowEventForm }) => {
     }
   };
 
-  const localStorageChecker = async () => {
-    if (
-      localStorage.getItem("ThreadID") &&
-      localStorage.getItem("AssistantID") &&
-      localStorage.getItem("RunID")
-    ) {
-      //check if run status is expired or not
-      let runStatus = await openai.beta.threads.runs.retrieve(
-        currentGoal.threadID,
-        currentGoal.runID
-      );
+  // const localStorageChecker = async () => {
+  //   if (
+  //     localStorage.getItem("ThreadID") &&
+  //     localStorage.getItem("AssistantID") &&
+  //     localStorage.getItem("RunID")
+  //   ) {
+  //     //check if run status is expired or not
+  //     let runStatus = await openai.beta.threads.runs.retrieve(
+  //       currentGoal.threadID,
+  //       currentGoal.runID
+  //     );
 
-      if (runStatus.status == "expired") {
-        createNewAssistant();
+  //     if (runStatus.status == "expired") {
+  //       createNewAssistant();
+  //     } else {
+  //       setThreadID(localStorage.getItem("ThreadID"));
+  //       setAssistantID(localStorage.getItem("AssistantID"));
+  //       setRunID(localStorage.getItem("RunID"));
+  //       console.log("local storage checker passed");
+  //       checkStatusAndPrintMessages(currentGoal.threadID, currentGoal.runID);
+  //     }
+  //   } else {
+  //     createNewAssistant();
+  //   }
+  // };
+
+  const localStorageChecker = async () => {
+    // Ensure this runs only in the client (browser)
+    if (typeof window === "undefined") return;
+
+    try {
+      if (
+        localStorage.getItem("ThreadID") &&
+        localStorage.getItem("AssistantID") &&
+        localStorage.getItem("RunID")
+      ) {
+        // Retrieve IDs from localStorage
+        const threadID = localStorage.getItem("ThreadID");
+        const assistantID = localStorage.getItem("AssistantID");
+        const runID = localStorage.getItem("RunID");
+
+        // Check if run status is expired or not
+        let runStatus = await openai.beta.threads.runs.retrieve(
+          threadID,
+          runID
+        );
+
+        if (runStatus.status === "expired") {
+          createNewAssistant();
+        } else {
+          // Set thread, assistant, and run IDs
+          setThreadID(threadID);
+          setAssistantID(assistantID);
+          setRunID(runID);
+
+          console.log("local storage checker passed");
+
+          // Perform further actions
+          checkStatusAndPrintMessages(threadID, runID);
+        }
       } else {
-        setThreadID(localStorage.getItem("ThreadID"));
-        setAssistantID(localStorage.getItem("AssistantID"));
-        setRunID(localStorage.getItem("RunID"));
-        console.log("local storage checker passed");
-        checkStatusAndPrintMessages(currentGoal.threadID, currentGoal.runID);
+        // If any item is missing, create a new assistant
+        createNewAssistant();
       }
-    } else {
-      createNewAssistant();
+    } catch (error) {
+      console.error("Error in localStorageChecker:", error);
+      // Handle errors like API failures, etc.
     }
   };
 

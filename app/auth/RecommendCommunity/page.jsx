@@ -42,6 +42,8 @@ const CommunityRecommendationPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      if (typeof window === "undefined") return;
+
       const userEmail = localStorage.getItem("Email");
       if (!userEmail) {
         throw new Error("User email not found. Please log in.");

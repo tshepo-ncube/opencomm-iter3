@@ -189,6 +189,8 @@ const AdminDash = () => {
   };
 
   const handleEventSubmit = (eventDetails) => {
+    if (typeof window === "undefined") return;
+
     createEvent(eventDetails, localStorage.getItem("CurrentCommunity"));
   };
 
