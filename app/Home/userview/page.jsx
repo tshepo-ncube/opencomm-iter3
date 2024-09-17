@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Autocomplete from "react-google-autocomplete";
 import Header from "../../../_Components/header";
 import EventsHolder1 from "../../../_Components/EventsHolder1";
