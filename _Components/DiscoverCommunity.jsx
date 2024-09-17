@@ -51,16 +51,16 @@ const DiscoverCommunity = ({ email }) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    CommunityDB.createCommunity(
-      { name, description, category: "general" },
-      setSubmittedData,
-      setLoading
-    );
-    setName("");
-    setDescription("");
-  };
+  // const handleFormSubmit = (e) => {
+  //   e.preventDefault();
+  //   CommunityDB.createCommunity(
+  //     { name, description, category: "general" },
+  //     setSubmittedData,
+  //     setLoading
+  //   );
+  //   setName("");
+  //   setDescription("");
+  // };
 
   const handleEdit = (index) => {
     setName(submittedData[index].name);

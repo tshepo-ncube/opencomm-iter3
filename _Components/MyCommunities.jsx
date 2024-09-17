@@ -231,7 +231,7 @@ const DiscoverCommunity = ({ email }) => {
                     <div
                       className="relative w-full max-w-sm bg-white border border-gray_og rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 flex-grow flex flex-col h-full cursor-pointer"
                       onClick={() => {
-                        // handleViewCommunity(data);
+                        handleViewCommunity(data);
                         console.log(data);
                       }}
                       style={{ position: "relative" }}
@@ -292,7 +292,7 @@ const DiscoverCommunity = ({ email }) => {
                           }}
                           onClick={(e) => {
                             e.stopPropagation(); // Prevent triggering the card's onClick
-                            // handleViewCommunity(data);
+                            handleViewCommunity(data);
                           }}
                           size="small"
                         >
