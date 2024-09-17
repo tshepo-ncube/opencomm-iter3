@@ -1,11 +1,11 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
+import Sidebar from "../../_Components/sidebar";
 import Header from "../../_Components/header";
 import CommunityDB from "../../database/community/community";
 import AdminCommunity from "../../_Components/AdminCommunities";
 import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
-import strings from "../../Utils/strings.json";
 
 const CreateCommunity = () => {
   const [isPopupOpen, setPopupOpen] = useState(false);
@@ -22,23 +22,30 @@ const CreateCommunity = () => {
   const [userEmail, setUserEmail] = useState("");
   const [userPhone, setUserPhone] = useState("");
   const [roles, setRoles] = useState({ user: false, admin: false });
-  const fileInputRef = useRef(null);
-  const popupRef = useRef(null);
-  const userPopupRef = useRef(null);
-  const handleUploadButtonClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-  const handleOpenPopup = () => setPopupOpen(true);
-  const handleClosePopup = () => setPopupOpen(false);
-  const [image, setImage] = useState(null);
+  const [url, setUrl] = useState("");
 
+  // Image fields
+  const [image, setImage] = useState(null);
+  const fileInputRef = useRef(null);
   const handleImageUpload = (event) => {
     if (event.target.files && event.target.files[0]) {
       setImage(event.target.files[0]);
     }
   };
+
+  const handleUploadButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+  //
+
+  const popupRef = useRef(null);
+  const userPopupRef = useRef(null);
+
+  const handleOpenPopup = () => setPopupOpen(true);
+  const handleClosePopup = () => setPopupOpen(false);
+
   const handleOpenUserPopup = () => setUserPopupOpen(true);
   const handleCloseUserPopup = () => setUserPopupOpen(false);
 
@@ -47,8 +54,17 @@ const CreateCommunity = () => {
     setRoles((prevRoles) => ({ ...prevRoles, [name]: checked }));
   };
 
-  const handleFormSubmit = async (e, status) => {
+  const handleFormSubmit = (e, status) => {
     e.preventDefault();
+
+    if (!image) {
+      alert("Please include an image");
+      return;
+    }
+
+    // CommunityDB.uploadCommunityImage(image);
+
+    //uploadCommunityImage;
 
     const communityData = {
       name,
@@ -56,6 +72,8 @@ const CreateCommunity = () => {
       category,
       status,
     };
+
+    //Need to add image to community data to then update th DB
 
     if (editIndex !== null) {
       CommunityDB.updateCommunity(
@@ -68,39 +86,31 @@ const CreateCommunity = () => {
         setLoading
       );
     } else {
-      console.log("creating a channel now...");
-      try {
-        const res = await axios.post(
-          strings.server_endpoints.createChannel,
-          { name, description, category, status },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+      //   CommunityDB.createCommunity(
+      //     communityData,
+      //     (newCommunity) =>
+      //       setSubmittedData((prevData) => [...prevData, newCommunity]),
+      //     setLoading
+      //   );
 
-        console.log(res.data);
-        let data = res.data;
-
-        CommunityDB.createCommunity(
-          communityData,
-          (newCommunity) =>
-            setSubmittedData((prevData) => [...prevData, newCommunity]),
-          setLoading,
-          {
-            WebUrl: data.webUrl,
-            ChannelID: data.id,
-          }
-        );
-      } catch (err) {
-        console.log("error");
-      }
+      CommunityDB.createCommunity(
+        {
+          name,
+          description,
+          category,
+          status,
+        },
+        image,
+        (newCommunity) =>
+          setSubmittedData((prevData) => [...prevData, newCommunity]),
+        setLoading
+      );
     }
 
     setName("");
     setDescription("");
     setCategory("general");
+    setImage(null); //image
     setEditIndex(null);
     setPopupOpen(false);
   };
@@ -109,6 +119,7 @@ const CreateCommunity = () => {
     setName(submittedData[index].name);
     setDescription(submittedData[index].description);
     setCategory(submittedData[index].category);
+    setImage(submittedData[index].image); //image
     setEditIndex(index);
     setPopupOpen(true);
   };
@@ -139,64 +150,40 @@ const CreateCommunity = () => {
     };
   }, []);
 
-  const generateDescription = async () => {
-    console.log("generate Description");
-    if (name.length !== 0) {
-      try {
-        const res = await axios.post(
-          strings.server_endpoints.generateCommunityDescription,
-          { name },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        console.log("Returned Desctiption: ", res.communityDescription);
-        console.log(res.data.communityDescription);
-        //setMessages(res.data.messages);
-        setDescription(res.data.communityDescription);
-      } catch (error) {
-        console.log(error);
-      }
-    } else {
-      alert("Please enter a name.");
-    }
-  };
-
-  const [previewUrl, setPreviewUrl] = useState(null);
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImage(file); // Store the uploaded image
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result); // Set the preview URL
-      };
-      reader.readAsDataURL(file); // Read the image file as a data URL
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle form submission or upload logic here
-    console.log("Image uploaded:", image);
-  };
   return (
     <div className="flex-col items-center min-h-screen relative text-center">
       <Header />
+      <div className="flex justify-center mt-8 mb-4">
+        <span
+          onClick={() => setView("Communities")}
+          className={`cursor-pointer mx-4 text-lg ${
+            view === "Communities" ? "font-bold text-black" : "text-gray-500"
+          }`}
+        >
+          Community Management
+        </span>
+        <span
+          onClick={() => setView("User Management")}
+          className={`cursor-pointer mx-4 text-lg ${
+            view === "User Management"
+              ? "font-bold text-black"
+              : "text-gray-500"
+          }`}
+        >
+          User Management
+        </span>
+      </div>
+
+      <div className="border-t border-openbox-green w-full my-4"></div>
 
       {view === "Communities" ? (
         <>
-          {/* Floating Action Button */}
-          <div className="fixed bottom-4 right-4 z-20">
+          <div className="flex justify-center mt-4 mb-8">
             <button
               onClick={handleOpenPopup}
-              className="btn bg-openbox-green hover:bg-hover-obgreen text-white font-medium rounded-full p-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-300"
+              className="btn bg-openbox-green hover:bg-hover-obgreen text-white font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary-300"
             >
-              + Create Community
+              + CREATE COMMUNITY
             </button>
           </div>
 
@@ -264,10 +251,21 @@ const CreateCommunity = () => {
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="mt-1 p-2  h-40 border border-gray-300 rounded-md w-full"
+                    className="mt-1 p-2 border border-gray-300 rounded-md w-full"
                     required
                   />
                 </div>
+
+                {image && (
+                  <div>
+                    <p>Image uploaded successfully!</p>
+                    <img
+                      src={image}
+                      alt="Uploaded"
+                      style={{ width: "300px" }}
+                    />
+                  </div>
+                )}
 
                 {/* Add Image here */}
 
@@ -301,13 +299,6 @@ const CreateCommunity = () => {
                 <div className="flex justify-end">
                   <button
                     type="button"
-                    onClick={generateDescription}
-                    className="btn bg-purple-400 hover:bg-hover-obgreen text-white font-medium rounded-lg text-sm px-5 py-2.5 mr-4 focus:outline-none focus:ring-2 focus:ring-primary-300"
-                  >
-                    generate description
-                  </button>
-                  <button
-                    type="button"
                     onClick={(e) => handleFormSubmit(e, "draft")}
                     className="btn bg-gray-500 hover:bg-gray-700 btn text-white font-medium rounded-lg text-sm px-5 py-2.5 mr-4 focus:outline-none focus:ring-2 focus:ring-primary-300"
                   >
@@ -328,6 +319,7 @@ const CreateCommunity = () => {
               </form>
             </div>
           )}
+
           {submittedData.length === 0 ? (
             <div className="text-center">
               <p className="text-gray-900 text-lg">

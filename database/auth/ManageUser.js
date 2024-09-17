@@ -24,9 +24,11 @@ import {
   deleteDoc,
   runTransaction,
 } from "firebase/firestore";
+import { useRouter } from "next/navigation";
 
 export default class ManageUser {
   static manageUserState = (setUser, setSignedIn) => {
+    const router = useRouter();
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -37,7 +39,8 @@ export default class ManageUser {
         // User is signed in.
         setUser(user);
 
-        window.location.href = "http://localhost:3000/Home";
+        //window.location.href = "http://localhost:3000/Home";
+        router.push(`/Home`);
       } else {
         setSignedIn(false);
         setUser(null);
@@ -95,7 +98,7 @@ export default class ManageUser {
       });
     } catch (error) {
       console.error("Error getting Profile Data: ", error);
-      alert(error);
+      //alert(error);
     }
   };
   static editPassword = (newPassword, setError) => {
@@ -174,7 +177,7 @@ export default class ManageUser {
       });
     } catch (error) {
       console.error("Error getting Profile Data: ", error);
-      alert(error);
+      //alert(error);
     }
   };
 
@@ -237,7 +240,7 @@ export default class ManageUser {
       }
     } catch (error) {
       console.error("Error getting user ID: ", error);
-      alert(error);
+      //alert(error);
     }
   };
 
